@@ -51,5 +51,27 @@ ccpuid_rdrand_64:
 	movq %rax, (%rdi)
 	retq
 
+/* removed: Segmentation fault */
+/* .globl ccpuid_fetch_vendor
+ccpuid_fetch_vendor:
+	pushq %rbp
+	movq %rsp, %rbp
+	subq $16, %rsp
+	
+	leaq -16(%rbp), %rdi
+	xorl %esi, %esi
+	call ccpuid_cpuid_1
+	movl %eax, -12(%rbp)
+	movl %eax, (%rdi)
+	movl %eax, -4(%rbp)
+	movl %eax, 4(%rdi)
+	movl %eax, -8(%rbp)
+	movl %eax, 8(%rdi)
+	movq %rdi, %rax
+	addq $16, %rsp
+	leave
+	retq */
+
+
 /* remove ld warning */
 .section .note.GNU-stack

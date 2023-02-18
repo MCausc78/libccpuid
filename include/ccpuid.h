@@ -352,7 +352,18 @@ extern void ccpuid_rdseed_16(uint16_t seed);
 extern void ccpuid_rdseed_32(uint32_t seed);
 extern void ccpuid_rdseed_64(uint64_t seed);
 
-extern char * ccpuid_fetch_vendor(char * vendor);
+/* extern char * ccpuid_fetch_vendor(char * vendor); */
+
+inline
+char * ccpuid_fetch_vendor(char * vendor)
+{
+	ccpuid_result_t info;
+	ccpuid_cpuid_1(&info, 0);
+	(*(int *) &vendor[0]) = info.ebx;
+	(*(int *) &vendor[4]) = info.edx;
+	(*(int *) &vendor[8]) = info.ecx;
+	return vendor;
+}
 
 #ifdef __cplusplus
 }
