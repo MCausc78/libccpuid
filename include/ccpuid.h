@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include <string.h>
 
 enum ccpuid_fi_edx
 {
@@ -333,6 +334,31 @@ enum ccpuid_epi_ecx
 	EPI_ECX_UNK4 = 1 << 31, /* unknown */
 };
 
+enum ccpuid_hfp
+{
+	HFP_EAX_I486_PENTIUM = 0x01,
+	HFP_EAX_PENTIUM_PRO = 0x02,
+	HFP_EAX_PENTIUM_II = 0x02,
+	HFP_EAX_CELERON = 0x02,
+	HFP_EAX_PENTIUM_III = 0x03,
+	HFP_EAX_PENTIUM_4 = 0x02,
+	HFP_EAX_XEON = 0x02,
+	HFP_EAX_PENTIUM_M = 0x02,
+	HFP_EAX_PENTIUM_4_HT = 0x05,
+	HFP_EAX_PENTIUM_D8XX = 0x05,
+	HFP_EAX_PENTIUM_D9XX = 0x06,
+	HFP_EAX_CORE_DUO = 0x0A,
+	HFP_EAX_CORE_2_DUO = 0x0A,
+	HFP_EAX_XEON_3000_5000 = 0x0A,
+	HFP_EAX_CORE_2_DUO_8000 = 0x0D,
+	HFP_EAX_XEON_5200_5400 = 0x0A,
+	HFP_EAX_ATOM = 0x0A,
+	HFP_EAX_NEHALEM = 0x0B,
+	HFP_EAX_IVY_BRIDGE = 0x0D,
+	HFP_EAX_SKYLAKE = 0x16,
+	HFP_EAX_SOC = 0x17,
+};
+
 typedef struct ccpuid_result
 {
 	uint32_t eax;
@@ -340,6 +366,72 @@ typedef struct ccpuid_result
 	uint32_t ecx;
 	uint32_t edx;
 } ccpuid_result_t;
+
+extern const char * CCPUID_VENDORS_AMD_K5;
+extern const char * CCPUID_VENDORS_AMD;
+extern const char * CCPUID_VENDORS_WINCHIP;
+extern const char * CCPUID_VENDORS_CYRIX;
+extern const char * CCPUID_VENDORS_INTEL;
+extern const char * CCPUID_VENDORS_TRANSMETA;
+extern const char * CCPUID_VENDORS_TRANSMETA_ALT;
+extern const char * CCPUID_VENDORS_NSC;
+extern const char * CCPUID_VENDORS_NEXGEN;
+extern const char * CCPUID_VENDORS_RISE;
+extern const char * CCPUID_VENDORS_SIS;
+extern const char * CCPUID_VENDORS_UMC;
+extern const char * CCPUID_VENDORS_VIA;
+extern const char * CCPUID_VENDORS_VORTEX86;
+extern const char * CCPUID_VENDORS_ZHAOXIN;
+extern const char * CCPUID_VENDORS_HYGON;
+extern const char * CCPUID_VENDORS_RDC;
+extern const char * CCPUID_VENDORS_ELBRUS;
+extern const char * CCPUID_VENDORS_AO486;
+extern const char * CCPUID_VENDORS_BHYVE;
+extern const char * CCPUID_VENDORS_KVM;
+extern const char * CCPUID_VENDORS_QEMU;
+extern const char * CCPUID_VENDORS_HYPER_V;
+extern const char * CCPUID_VENDORS_X86_TO_ARM;
+extern const char * CCPUID_VENDORS_PARALLELS;
+extern const char * CCPUID_VENDORS_PARALLELS_ALT;
+extern const char * CCPUID_VENDORS_VMWARE;
+extern const char * CCPUID_VENDORS_XEN_HVM;
+extern const char * CCPUID_VENDORS_ACRN;
+extern const char * CCPUID_VENDORS_QNX;
+extern const char * CCPUID_VENDORS_ROSETTA_2;
+
+enum ccpuid_vendor
+{
+	CCPUID_VENDOR_UNKNOWN,
+	CCPUID_VENDOR_AMD_K5,
+	CCPUID_VENDOR_AMD,
+	CCPUID_VENDOR_WINCHIP,
+	CCPUID_VENDOR_CYRIX,
+	CCPUID_VENDOR_INTEL,
+	CCPUID_VENDOR_TRANSMETA,
+	CCPUID_VENDOR_NSC,
+	CCPUID_VENDOR_NEXGEN,
+	CCPUID_VENDOR_RISE,
+	CCPUID_VENDOR_SIS,
+	CCPUID_VENDOR_UMC,
+	CCPUID_VENDOR_VIA,
+	CCPUID_VENDOR_VORTEX86,
+	CCPUID_VENDOR_ZHAOXIN,
+	CCPUID_VENDOR_HYGON,
+	CCPUID_VENDOR_RDC,
+	CCPUID_VENDOR_ELBRUS,
+	CCPUID_VENDOR_AO486,
+	CCPUID_VENDOR_BHYVE,
+	CCPUID_VENDOR_KVM,
+	CCPUID_VENDOR_QEMU,
+	CCPUID_VENDOR_HYPER_V,
+	CCPUID_VENDOR_X86_TO_ARM,
+	CCPUID_VENDOR_PARALLELS,
+	CCPUID_VENDOR_VMWARE,
+	CCPUID_VENDOR_XEN_HVM,
+	CCPUID_VENDOR_ACRN,
+	CCPUID_VENDOR_QNX,
+	CCPUID_VENDOR_ROSETTA_2,
+};
 
 extern ccpuid_result_t * ccpuid_cpuid_1(ccpuid_result_t * dest, int leaf);
 extern ccpuid_result_t * ccpuid_cpuid_2(ccpuid_result_t * dest, int leaf, int subleaf);
@@ -359,11 +451,32 @@ char * ccpuid_fetch_vendor(char * vendor)
 {
 	ccpuid_result_t info;
 	ccpuid_cpuid_1(&info, 0);
-	(*(int *) &vendor[0]) = info.ebx;
-	(*(int *) &vendor[4]) = info.edx;
-	(*(int *) &vendor[8]) = info.ecx;
+	(*(int *) vendor) = info.ebx;
+	(*(int *) (vendor + 4)) = info.edx;
+	(*(int *) (vendor + 8)) = info.ecx;
 	return vendor;
 }
+
+inline
+size_t ccpuid_fetch_brand(char * brand)
+{
+	size_t len = 48;
+	int i;
+	char buffer[96] = { 0 };
+	for (i = 0; i <= 2; ++i)
+	{
+		ccpuid_cpuid_1((ccpuid_result_t *) (buffer + i * 16), i + 0x80000002);
+	}
+	char * ptr = buffer;
+	for (i = 0; i < 48 && buffer[i] == ' '; ++i, ++ptr);
+	char * eos = memchr(ptr, '\0', 48);
+	len = eos - ptr;
+	memcpy(brand, ptr, len);
+	return len;
+}
+
+extern enum ccpuid_vendor ccpuid_get_vendor(void);
+extern const char * ccpuid_vendor_tostring(enum ccpuid_vendor vendor);
 
 #ifdef __cplusplus
 }

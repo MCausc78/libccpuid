@@ -5,7 +5,7 @@ mkdir -pv bin/ obj/
 AS=as
 ASFLAGS=
 CC=clang
-CCFLAGS='-O2 -Wall -Werror'
+CCFLAGS='-O2 -Wall -Werror -fPIC'
 CPPFLAGS='-Iinclude'
 LD=clang
 LDFLAGS=
