@@ -20,7 +20,7 @@ while [ $i -le $# ]; do
   "?"|h|H|help)
    TAB=$'\t'
    cat <<EOF
-usage: $0 [--OPTION'S]
+usage: $0 [--OPTION's]
 
 where OPTION is:
 ${TAB}-32, --32${TAB}Target 32-bit x86
@@ -37,7 +37,7 @@ EOF
  i=$(expr $i + 1)
 done
 
-rm -frv bin/ obj/
+rm -frv obj/
 mkdir -pv bin/ obj/
 
 AS=as
@@ -60,9 +60,9 @@ case $BITS in
   ;;
 esac
 
-echo " AS ccpuid${BITS}.s"
-$AS --$BITS $ASFLAGS -o obj/ccpuid.s.o ccpuid${BITS}.s
+echo " AS ccpuid$BITS.s"
+$AS --$BITS $ASFLAGS -o obj/ccpuid.s.o ccpuid$BITS.s
 echo " CC ccpuid.c"
-$CC -m$BITS $CCFLAGS -DCCPUID_BITS=${BITS} $CPPFLAGS -c -o obj/ccpuid.c.o ccpuid.c
+$CC -m$BITS $CCFLAGS -DCCPUID_BITS=$BITS $CPPFLAGS -c -o obj/ccpuid.c.o ccpuid.c
 echo " LD"
-$LD -m$BITS -shared $LDFLAGS -o bin/libccpuid.so obj/**/**.o
+$LD -m$BITS -shared $LDFLAGS -o bin/libccpuid$BITS.so obj/**/**.o
