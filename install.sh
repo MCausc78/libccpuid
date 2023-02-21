@@ -1,4 +1,4 @@
 #!/bin/bash
-
-cp bin/libccpuid.so /usr/lib/x86_64-linux-gnu/
-cp include/ccpuid.h /usr/include/x86_64-linux-gnu/
+TARGET=$(uname -m)-linux-gnu
+cp bin/libccpuid.so /usr/lib/$TARGET/
+cp include/ccpuid.h /usr/include/$TARGET/

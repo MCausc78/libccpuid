@@ -1,5 +1,68 @@
 #include <ccpuid.h>
-#include <string.h>
+
+#ifndef CCPUID_NO_STDLIB
+# define CCPUID_MEM_COMPARE(x,y,z) memcmp((x),(y),(z))
+#else
+# define CCPUID_MEM_COMPARE(x,y,z) ccpuid_memcmp((x),(y),(z))
+#endif
+
+void * ccpuid_memchr(const void * mem, int ch, size_t count)
+{
+	const uint8_t * area;
+	area = mem;
+	size_t i;
+	for (i = 0; i < count; ++i)
+	{
+		if (*area == (uint8_t) ch)
+		{
+			return (void *) area;
+		}
+		++area;
+	}
+	return NULL;
+}
+
+int ccpuid_memcmp(const void * lhs, const void * rhs,  size_t count)
+{
+	size_t i;
+	const uint8_t * first, * second;
+	first = lhs;
+	second = rhs;
+	for (i = 0; i < count; ++i)
+	{
+		if (*first < *second)
+		{
+			return -1;
+		}
+		else if (*first > *second)
+		{
+			return 1;
+		}
+		++first;
+		++second;
+	}
+	return 0;
+}
+
+void * ccpuid_memcpy(void * dest, const void * source, size_t count)
+{
+	size_t i, j;
+	unsigned long * wdest = dest;
+	const unsigned long * wsource = source;
+	uint8_t * cdest;
+	const uint8_t * csource;
+	for (i = 0, j = count / sizeof(long); i < j; ++i)
+	{
+		*wdest++ = *wsource++;
+	}
+	cdest = (uint8_t *) wdest;
+	csource = (const uint8_t *) wsource;
+	for (i = 0, j = count % sizeof(long); i < j; ++i)
+	{
+		*cdest++ = *csource++;
+	}
+	return dest;
+}
 
 const char * CCPUID_VENDORS_AMD_K5 = "AMDisbetter!";
 const char * CCPUID_VENDORS_AMD = "AuthenticAMD";
@@ -37,119 +100,119 @@ enum ccpuid_vendor ccpuid_get_vendor(void)
 {
 	char vendor[13] = { 0 };
 	ccpuid_fetch_vendor(vendor);
-	if (memcmp(vendor, CCPUID_VENDORS_AMD_K5, 12) == 0)
+	if (CCPUID_MEM_COMPARE(vendor, CCPUID_VENDORS_AMD_K5, 12) == 0)
 	{
 		return CCPUID_VENDOR_AMD_K5;
 	}
-	else if (memcmp(vendor, CCPUID_VENDORS_AMD, 12) == 0)
+	else if (CCPUID_MEM_COMPARE(vendor, CCPUID_VENDORS_AMD, 12) == 0)
 	{
 		return CCPUID_VENDOR_AMD;
 	}
-	else if (memcmp(vendor, CCPUID_VENDORS_WINCHIP, 12) == 0)
+	else if (CCPUID_MEM_COMPARE(vendor, CCPUID_VENDORS_WINCHIP, 12) == 0)
 	{
 		return CCPUID_VENDOR_WINCHIP;
 	}
-	else if (memcmp(vendor, CCPUID_VENDORS_CYRIX, 12) == 0)
+	else if (CCPUID_MEM_COMPARE(vendor, CCPUID_VENDORS_CYRIX, 12) == 0)
 	{
 		return CCPUID_VENDOR_CYRIX;
 	}
-	else if (memcmp(vendor, CCPUID_VENDORS_INTEL, 12) == 0)
+	else if (CCPUID_MEM_COMPARE(vendor, CCPUID_VENDORS_INTEL, 12) == 0)
 	{
 		return CCPUID_VENDOR_INTEL;
 	}
-	else if (memcmp(vendor, CCPUID_VENDORS_TRANSMETA, 12) == 0 || memcmp(vendor, CCPUID_VENDORS_TRANSMETA_ALT, 12) == 0)
+	else if (CCPUID_MEM_COMPARE(vendor, CCPUID_VENDORS_TRANSMETA, 12) == 0 || CCPUID_MEM_COMPARE(vendor, CCPUID_VENDORS_TRANSMETA_ALT, 12) == 0)
 	{
 		return CCPUID_VENDOR_TRANSMETA;
 	}
-	else if (memcmp(vendor, CCPUID_VENDORS_NSC, 12) == 0)
+	else if (CCPUID_MEM_COMPARE(vendor, CCPUID_VENDORS_NSC, 12) == 0)
 	{
 		return CCPUID_VENDOR_NSC;
 	}
-	else if (memcmp(vendor, CCPUID_VENDORS_NEXGEN, 12) == 0)
+	else if (CCPUID_MEM_COMPARE(vendor, CCPUID_VENDORS_NEXGEN, 12) == 0)
 	{
 		return CCPUID_VENDOR_NEXGEN;
 	}
-	else if (memcmp(vendor, CCPUID_VENDORS_RISE, 12) == 0)
+	else if (CCPUID_MEM_COMPARE(vendor, CCPUID_VENDORS_RISE, 12) == 0)
 	{
 		return CCPUID_VENDOR_RISE;
 	}
-	else if (memcmp(vendor, CCPUID_VENDORS_SIS, 12) == 0)
+	else if (CCPUID_MEM_COMPARE(vendor, CCPUID_VENDORS_SIS, 12) == 0)
 	{
 		return CCPUID_VENDOR_SIS;
 	}
-	else if (memcmp(vendor, CCPUID_VENDORS_UMC, 12) == 0)
+	else if (CCPUID_MEM_COMPARE(vendor, CCPUID_VENDORS_UMC, 12) == 0)
 	{
 		return CCPUID_VENDOR_UMC;
 	}
-	else if (memcmp(vendor, CCPUID_VENDORS_VIA, 12) == 0)
+	else if (CCPUID_MEM_COMPARE(vendor, CCPUID_VENDORS_VIA, 12) == 0)
 	{
 		return CCPUID_VENDOR_VIA;
 	}
-	else if (memcmp(vendor, CCPUID_VENDORS_VORTEX86, 12) == 0)
+	else if (CCPUID_MEM_COMPARE(vendor, CCPUID_VENDORS_VORTEX86, 12) == 0)
 	{
 		return CCPUID_VENDOR_VORTEX86;
 	}
-	else if (memcmp(vendor, CCPUID_VENDORS_ZHAOXIN, 12) == 0)
+	else if (CCPUID_MEM_COMPARE(vendor, CCPUID_VENDORS_ZHAOXIN, 12) == 0)
 	{
 		return CCPUID_VENDOR_ZHAOXIN;
 	}
-	else if (memcmp(vendor, CCPUID_VENDORS_HYGON, 12) == 0)
+	else if (CCPUID_MEM_COMPARE(vendor, CCPUID_VENDORS_HYGON, 12) == 0)
 	{
 		return CCPUID_VENDOR_HYGON;
 	}
-	else if (memcmp(vendor, CCPUID_VENDORS_RDC, 12) == 0)
+	else if (CCPUID_MEM_COMPARE(vendor, CCPUID_VENDORS_RDC, 12) == 0)
 	{
 		return CCPUID_VENDOR_RDC;
 	}
-	else if (memcmp(vendor, CCPUID_VENDORS_ELBRUS, 12) == 0)
+	else if (CCPUID_MEM_COMPARE(vendor, CCPUID_VENDORS_ELBRUS, 12) == 0)
 	{
 		return CCPUID_VENDOR_ELBRUS;
 	}
-	else if (memcmp(vendor, CCPUID_VENDORS_AO486, 12) == 0)
+	else if (CCPUID_MEM_COMPARE(vendor, CCPUID_VENDORS_AO486, 12) == 0)
 	{
 		return CCPUID_VENDOR_AO486;
 	}
-	else if (memcmp(vendor, CCPUID_VENDORS_BHYVE, 12) == 0)
+	else if (CCPUID_MEM_COMPARE(vendor, CCPUID_VENDORS_BHYVE, 12) == 0)
 	{
 		return CCPUID_VENDOR_BHYVE;
 	}
-	else if (memcmp(vendor, CCPUID_VENDORS_KVM, 12) == 0)
+	else if (CCPUID_MEM_COMPARE(vendor, CCPUID_VENDORS_KVM, 12) == 0)
 	{
 		return CCPUID_VENDOR_KVM;
 	}
-	else if (memcmp(vendor, CCPUID_VENDORS_QEMU, 12) == 0)
+	else if (CCPUID_MEM_COMPARE(vendor, CCPUID_VENDORS_QEMU, 12) == 0)
 	{
 		return CCPUID_VENDOR_QEMU;
 	}
-	else if (memcmp(vendor, CCPUID_VENDORS_HYPER_V, 12) == 0)
+	else if (CCPUID_MEM_COMPARE(vendor, CCPUID_VENDORS_HYPER_V, 12) == 0)
 	{
 		return CCPUID_VENDOR_HYPER_V;
 	}
-	else if (memcmp(vendor, CCPUID_VENDORS_X86_TO_ARM, 12) == 0)
+	else if (CCPUID_MEM_COMPARE(vendor, CCPUID_VENDORS_X86_TO_ARM, 12) == 0)
 	{
 		return CCPUID_VENDOR_X86_TO_ARM;
 	}
-	else if (memcmp(vendor, CCPUID_VENDORS_PARALLELS, 12) == 0 || memcmp(vendor, CCPUID_VENDORS_PARALLELS_ALT, 12) == 0)
+	else if (CCPUID_MEM_COMPARE(vendor, CCPUID_VENDORS_PARALLELS, 12) == 0 || CCPUID_MEM_COMPARE(vendor, CCPUID_VENDORS_PARALLELS_ALT, 12) == 0)
 	{
 		return CCPUID_VENDOR_PARALLELS;
 	}
-	else if (memcmp(vendor, CCPUID_VENDORS_VMWARE, 12) == 0)
+	else if (CCPUID_MEM_COMPARE(vendor, CCPUID_VENDORS_VMWARE, 12) == 0)
 	{
 		return CCPUID_VENDOR_VMWARE;
 	}
-	else if (memcmp(vendor, CCPUID_VENDORS_XEN_HVM, 12) == 0)
+	else if (CCPUID_MEM_COMPARE(vendor, CCPUID_VENDORS_XEN_HVM, 12) == 0)
 	{
 		return CCPUID_VENDOR_XEN_HVM;
 	}
-	else if (memcmp(vendor, CCPUID_VENDORS_ACRN, 12) == 0)
+	else if (CCPUID_MEM_COMPARE(vendor, CCPUID_VENDORS_ACRN, 12) == 0)
 	{
 		return CCPUID_VENDOR_ACRN;
 	}
-	else if (memcmp(vendor, CCPUID_VENDORS_QNX, 12) == 0)
+	else if (CCPUID_MEM_COMPARE(vendor, CCPUID_VENDORS_QNX, 12) == 0)
 	{
 		return CCPUID_VENDOR_QNX;
 	}
-	else if (memcmp(vendor, CCPUID_VENDORS_ROSETTA_2, 12) == 0)
+	else if (CCPUID_MEM_COMPARE(vendor, CCPUID_VENDORS_ROSETTA_2, 12) == 0)
 	{
 		return CCPUID_VENDOR_ROSETTA_2;
 	}
